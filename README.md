@@ -5,7 +5,11 @@ The EEG signals were obtained from 12 subjects using a
 novel smart 3D printed electrode consisting of a central and a ring electrodes.
 
 ## Prerequisites Libraries and packages:
-1) Install the Fir1 library from _https://github.com/berndporr/fir1_ by running:
+Process might differ depend on your operating system.
+
+1) Install the Fir1 library from _https://github.com/berndporr/fir1_ 
+
+* For Linux run on terminal:
 
 ` sudo add-apt-repository ppa:berndporr/dsp `
 
@@ -13,15 +17,41 @@ novel smart 3D printed electrode consisting of a central and a ring electrodes.
 
 ` sudo apt-get install fir1-dev `
 
-2) Install openCV library by running:
+* For MacOS run on terminal with homebrew package manager https://brew.sh/:
+
+`brew tap berndporr/dsp`
+
+`brew install fir`
+
+2) Install Iir1 library from _https://github.com/berndporr/iir1_
+
+* For MacOS run on terminal with homebrew package manager https://brew.sh/:
+
+`brew tap berndporr/dsp`
+
+`brew install iir`
+
+3) Install openCV library by running:
+
+* For Linux run on terminal:
 
 ` sudo apt install libopencv-dev -y `
 
-3) Install boost library by running:
+* For MacOS run on terminal with homebrew package manager https://brew.sh/:
+
+`brew install opencv`
+
+4) Install boost library by running:
+
+* For Linux run on terminal:
 
 ` sudo apt-get install libboost-all-dev`
 
-4) And make sure you have ` cmake ` installed.
+* For MacOS run on terminal with homebrew package manager https://brew.sh/:
+
+`brew install boost`
+
+5) And make sure you have ` cmake ` installed.
 
 ## How to compile and run the program:
 1) Clone this repository:
@@ -30,7 +60,7 @@ novel smart 3D printed electrode consisting of a central and a ring electrodes.
 
 2) Navigate to the folder:
 
-`cd Deep_Neuronal_Filter` 
+`cd deepNeuronalFilter` 
 
 3) execute the shell file:
 
