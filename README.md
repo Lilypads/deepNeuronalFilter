@@ -69,6 +69,12 @@ Process might differ depend on your operating system.
  This will create the necessary folders, build the program and the DNF library, and will run the executable.
  An interactive GUI will appear as below.
  
+If the executable file does not run and your operating system is a MacOS, you might need to run the following manually on the terminal. Make sure you are in the repository directory before you run.
+ 
+ `chmod 777 eeg_filter`
+ 
+ `./eeg_filter`
+ 
  ![Figure 2](./fig2.png)
 
 ### Conditioning the Inner and Outer signals:
