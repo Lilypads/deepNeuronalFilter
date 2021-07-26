@@ -57,7 +57,7 @@ for sweeper in range(sweepFrom,sweepTo):
         correction_a = np.loadtxt('../cppData{}/py_alpha_coefficient.txt'.format(fileName[myData]), int)
         correction_d = np.loadtxt('../cppData{}/py_delta_coefficient.txt'.format(fileName[myData]), int)
         goodOnes = np.loadtxt('../cppData{}/py_goodOnes.txt'.format(fileName[myData]), int)
-        num_subject = len(goodOnes)
+        num_subject = goodOnes.size
         subject_array = np.arange(0, num_subject, 1)
     
     alpha_matrix_orig = np.zeros((num_subject + 1) * iteration)
@@ -85,7 +85,10 @@ for sweeper in range(sweepFrom,sweepTo):
             if doParamSweep == 1:
                 subject = k + subject_first
             else:
-                subject = goodOnes[s]
+                if num_subject == 1:
+                    subject = goodOnes
+                else:    
+                    subject = goodOnes[s]
                 s += 1
                 print(subject, ', ', end='')
     
@@ -392,7 +395,7 @@ for sweeper in range(sweepFrom,sweepTo):
     print()
     print("----> ", len(np.where(alpha_max > 0)[0]), " alpha with sum of: ", np.sum(alpha_max))
     print("----> ", len(np.where(delta_max > 0)[0]), " delta with sum of: ", np.sum(delta_max))
-    print("----> ", len(goodOnes), ' good ones are: ', goodOnes)
+    print("----> ", goodOnes.size, ' good ones are: ', goodOnes)
     print('ALPHA SNR: ')
     print(alpha_max)
     print(alpha_max_coefficient)
