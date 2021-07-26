@@ -113,12 +113,14 @@ double feedback_closed_gain = 0;
 double feedback_open_gain = 0;
 #endif
 // FILES
+/*
 #ifdef DoDeepLearning
 fstream nn_file;
 fstream remover_file;
 fstream weight_closed_file;
 fstream weight_open_file;
 #endif
+*/
 fstream inner_file;
 fstream outer_file;
 fstream params_file;
@@ -242,6 +244,10 @@ for (int k = 0; k < num_subjects; k++) {
     //create files for saving the data and parameters
     string sbjct = std::to_string(SUBJECT);
 #ifdef DoDeepLearning
+fstream nn_file;
+fstream remover_file;
+fstream weight_closed_file;
+fstream weight_open_file;
     nn_file.open("./cppData/subject" + sbjct + "/fnn_subject" + sbjct + ".tsv", fstream::out);
     remover_file.open("./cppData/subject" + sbjct + "/remover_subject" + sbjct + ".tsv", fstream::out);
     weight_closed_file.open("./cppData/subject" + sbjct + "/lWeights_closed_subject" + sbjct + ".tsv", fstream::out);
@@ -256,6 +262,10 @@ for (int k = 0; k < num_subjects; k++) {
 
     if (!params_file) {
         cout << "Unable to create files";
+        exit(1); // terminate with error
+    }
+    if (!nn_file) {
+        cout << "Unable to create nn files";
         exit(1); // terminate with error
     }
 
