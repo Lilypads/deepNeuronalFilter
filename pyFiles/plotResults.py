@@ -367,7 +367,7 @@ for sweeper in range(sweepFrom,sweepTo):
                 plt.xticks([1, 5, 8, 12])
     
                 myFig1.savefig('../cppData' + fileName[myData] + '/subject' + str(subject) + '/py_subject_'
-                               + str(subject) + '_Figs', quality=10, format='eps', bbox_inches='tight')
+                               + str(subject) + '_Figs.eps', quality=10, format='eps', bbox_inches='tight')
                 plt.show()
     
     if doParamSweep == 1:

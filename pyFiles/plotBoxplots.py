@@ -100,7 +100,7 @@ plt.setp(ax.artists, edgecolor='k', facecolor='w')
 plt.setp(ax.lines, color='k')
 plt.plot(lineLFO, linewidth=0.4, color='green')
 plt.yscale('log')
-box_fig.savefig('../cppData' + fileName[myData] + '/SNRs_alpha_BoxPlots',
+box_fig.savefig('../cppData' + fileName[myData] + '/SNRs_alpha_BoxPlots.eps',
                 quality=100, format='eps', bbox_inches='tight')
 plt.show()
 
@@ -117,7 +117,7 @@ plt.setp(ax.artists, edgecolor='k', facecolor='w')
 plt.setp(ax.lines, color='k')
 plt.plot(lineLFO, linewidth=0.4, color='red')
 plt.yscale('log')
-box_fig.savefig('../cppData' + fileName[myData] + '/SNRs_delta_BoxPlots',
+box_fig.savefig('../cppData' + fileName[myData] + '/SNRs_delta_BoxPlots.eps',
                 quality=100, format='eps', bbox_inches='tight')
 plt.show()
 
@@ -127,7 +127,7 @@ plt.plot(snr_alpha_ratio, linewidth=0.4, color='black', marker="s", markersize=4
 plt.plot(snr_delta_ratio, linewidth=0.4, color='blue', marker="o", markersize=4)
 plt.xticks(np.arange(0, goodOnes.size, 1))
 plt.yscale('log')
-box_fig.savefig('../cppData' + fileName[myData] + '/SNRs_ratios',
+box_fig.savefig('../cppData' + fileName[myData] + '/SNRs_ratios.eps',
                 quality=100, format='eps', bbox_inches='tight')
 plt.show()
 
@@ -138,6 +138,6 @@ plt.scatter(snr_delta, snr_delta_ratio, linewidth=0.4, color='cyan')
 plt.xticks(np.arange(0, goodOnes.size, 1))
 plt.yscale('log')
 plt.xscale('log')
-box_fig.savefig('../cppData' + fileName[myData] + '/distributions',
+box_fig.savefig('../cppData' + fileName[myData] + '/distributions.eps',
                 quality=100, format='eps', bbox_inches='tight')
 plt.show()
