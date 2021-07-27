@@ -44,7 +44,31 @@ snr_delta_ratio = np.zeros(N_delta)
 my_whisk = 1000
 
 j = 0
-for i in goodOnes:
+if goodOnes.size > 1:
+    for i in goodOnes:
+        data_12 = np.loadtxt('../cppData_DNF/subject{}/py_subject_{}_SNRs.txt'.format( i, i))
+        data = np.loadtxt('../cppData{}/subject{}/py_subject_{}_SNRs.txt'.format(fileName[myData], i, i))
+        snr_alpha_12[j] = data_12[0]
+        snr_alpha[j] = data[0] 
+        correction_for_alpha = snr_alpha_12[j] / snr_alpha[j]
+        snr_alpha[j] = snr_alpha[j] * correction_for_alpha
+        snr_alpha_nn[j] = data[1] * correction_for_alpha
+        snr_alpha_ratio[j] = snr_alpha_nn[j]/snr_alpha[j]
+        j += 1
+    
+    j = 0
+    for i in goodOnes:
+        data_12 = np.loadtxt('../cppData_DNF/subject{}/py_subject_{}_SNRs.txt'.format( i, i))
+        data = np.loadtxt('../cppData{}/subject{}/py_subject_{}_SNRs.txt'.format(fileName[myData], i, i))
+        snr_delta_12[j] = data_12[3]
+        snr_delta[j] = data[3]
+        correction_for_delta = snr_delta_12[j] / snr_delta[j]
+        snr_delta[j] = snr_delta[j] * correction_for_delta
+        snr_delta_nn[j] = data[4] * correction_for_delta
+        snr_delta_ratio[j] = snr_delta_nn[j]/snr_delta[j]
+        j += 1
+else:
+    i = goodOnes
     data_12 = np.loadtxt('../cppData_DNF/subject{}/py_subject_{}_SNRs.txt'.format( i, i))
     data = np.loadtxt('../cppData{}/subject{}/py_subject_{}_SNRs.txt'.format(fileName[myData], i, i))
     snr_alpha_12[j] = data_12[0]
@@ -53,10 +77,7 @@ for i in goodOnes:
     snr_alpha[j] = snr_alpha[j] * correction_for_alpha
     snr_alpha_nn[j] = data[1] * correction_for_alpha
     snr_alpha_ratio[j] = snr_alpha_nn[j]/snr_alpha[j]
-    j += 1
-
-j = 0
-for i in goodOnes:
+    
     data_12 = np.loadtxt('../cppData_DNF/subject{}/py_subject_{}_SNRs.txt'.format( i, i))
     data = np.loadtxt('../cppData{}/subject{}/py_subject_{}_SNRs.txt'.format(fileName[myData], i, i))
     snr_delta_12[j] = data_12[3]
@@ -65,7 +86,6 @@ for i in goodOnes:
     snr_delta[j] = snr_delta[j] * correction_for_delta
     snr_delta_nn[j] = data[4] * correction_for_delta
     snr_delta_ratio[j] = snr_delta_nn[j]/snr_delta[j]
-    j += 1
 
 yy = np.concatenate((abs(snr_alpha), abs(snr_alpha_nn)))
 xx = np.concatenate((np.ones(N_alpha) * 1, np.ones(N_alpha) * 2))
@@ -105,7 +125,7 @@ box_fig = plt.figure('ratios')
 box_fig.add_subplot(111)
 plt.plot(snr_alpha_ratio, linewidth=0.4, color='black', marker="s", markersize=4)
 plt.plot(snr_delta_ratio, linewidth=0.4, color='blue', marker="o", markersize=4)
-plt.xticks(np.arange(0, len(goodOnes), 1))
+plt.xticks(np.arange(0, goodOnes.size, 1))
 plt.yscale('log')
 box_fig.savefig('../cppData' + fileName[myData] + '/SNRs_ratios',
                 quality=100, format='eps', bbox_inches='tight')
@@ -115,7 +135,7 @@ box_fig = plt.figure('distribution')
 box_fig.add_subplot(111)
 plt.scatter(snr_alpha, snr_alpha_ratio, linewidth=0.4, color='blue')
 plt.scatter(snr_delta, snr_delta_ratio, linewidth=0.4, color='cyan')
-plt.xticks(np.arange(0, len(goodOnes), 1))
+plt.xticks(np.arange(0, goodOnes.size, 1))
 plt.yscale('log')
 plt.xscale('log')
 box_fig.savefig('../cppData' + fileName[myData] + '/distributions',
