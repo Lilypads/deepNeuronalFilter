@@ -11,14 +11,23 @@ import matplotlib.pylab as plt
 import seaborn as sns
 import pandas as pd
 
+import os
+import sys
+# directory of script file
+print(os.path.abspath(os.path.dirname(sys.argv[0])))
+# change current working directory
+os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
+# current working directory
+print(os.getcwd())
+
 myData = 2 # 0 for DFN, 1 for LMS, 2 for Laplace
 fileName = ['_DNF', '_LMS', '_LPLC']
 
 goodOnes = np.loadtxt('../cppData{}/py_goodOnes.txt'.format(fileName[myData]), int)
 print('goodOnes: ', goodOnes)
 
-N_alpha = len(goodOnes)
-N_delta = len(goodOnes)
+N_alpha = goodOnes.size
+N_delta = goodOnes.size
 
 
 plt.close("all")
