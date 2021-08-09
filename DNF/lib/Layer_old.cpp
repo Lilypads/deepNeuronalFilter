@@ -353,7 +353,7 @@ void Layer::snapWeights(string _where, string _trial, int _subject){
     subject = _subject;
     trial = _trial;
     std::fstream wfile;
-    string name = "./cppData/recording" + std::to_string(subject) + "/grayLayer" + std::to_string(myLayerIndex+1) + "_" + trial + "_subject" + std::to_string(subject) + ".csv";
+    string name = "./cppData/subject" + std::to_string(subject) + "/grayLayer" + std::to_string(myLayerIndex+1) + "_" + trial + "_subject" + std::to_string(subject) + ".csv";
     wfile.open(name, fstream::out);
     if (!wfile || !wfile) {
         cout << "Unable to open grayScale files";

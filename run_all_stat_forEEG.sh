@@ -4,7 +4,7 @@ mkdir -p cppData
 n=1;
 max=12;
 while [ "$n" -le "$max" ]; do
-  mkdir -p "cppData/recording$n"
+  mkdir -p "cppData/subject$n"
   n=`expr "$n" + 1`;
 done
 

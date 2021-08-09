@@ -26,20 +26,16 @@ constexpr int ESC_key = 27;
 //int startTime = time(NULL);
 
 //adding delay line for the noise
-double noise_delayLine[noiseDelayLineLength] ={0.0};
-boost::circular_buffer<double> signal_delayLine(signalDelayLineLength);
+double outer_delayLine[outerDelayLineLength] ={0.0};
+boost::circular_buffer<double> inner_delayLine(innerDelayLineLength);
 
 // CONSTANTS
-const float fs = 250;
+//const float fs = 250;
 //const int numTrials = 2; //as in open and closed
-const int num_recordings = 12;
+const int num_subjects = 12;
 
-//COUNTERS
-int signal_counter;
-int noise_counter;
-
-#ifdef doNoiseDelayLine
-int num_inputs = noiseDelayLineLength;
+#ifdef doOuterDelayLine
+int num_inputs = outerDelayLineLength;
 #else
 int num_inputs = 1;
 #endif
@@ -54,24 +50,24 @@ double b_eta = 0;
 #endif
 
 //FILTERS
-Fir1 *noise_filter;
-Fir1 *signal_filter;
+Fir1 *outer_filter;
+Fir1 *inner_filter;
 Fir1 *lms_filter = nullptr;
 
 //SIGNALS
-double sample_num, signal_raw_data, noise_raw_data, check_digit;
+double sample_num, inner_raw_data, outer_raw_data, check_digit;
 
 // GAINS
-double noise_gain = 1;
-double signal_gain = 1;
+double outer_gain = 1;
+double inner_gain = 1;
 #ifdef DoDeepLearning
 double remover_gain = 0;
 double feedback_gain = 0;
 #endif
 
 // FILES
-fstream signal_file;
-fstream noise_file;
+fstream inner_file;
+fstream outer_file;
 fstream params_file;
 fstream lms_file;
 fstream lms_remover_file;
@@ -79,8 +75,8 @@ fstream laplace_file;
 ifstream raw_infile;
 void saveParam(){
     params_file << "Gains: "    << "\n"
-                << noise_gain << "\n"
-                << signal_gain << "\n"
+                << outer_gain << "\n"
+                << inner_gain << "\n"
 #ifdef DoDeepLearning
                 << remover_gain << "\n"
                 << feedback_gain << "\n"
@@ -105,21 +101,21 @@ void saveParam(){
                 << LMS_COEFF << "\n"
                 << LMS_LEARNING_RATE << "\n";
 
-#ifdef doNoisePreFilter
+#ifdef doOuterPreFilter
     params_file    << "didNoisePreFilter" << "\n"
                    << maxFilterLength << "\n";
 #endif
-#ifdef doSignalPreFilter
+#ifdef doInnerPreFilter
     params_file    << "didSignalPreFilter" << "\n"
                    << maxFilterLength << "\n";
 #endif
-#ifdef doNoiseDelayLine
-    params_file    << "didNoiseDelayLine" << "\n"
-                   << noiseDelayLineLength << "\n";
+#ifdef doOuterDelayLine
+    params_file    << "didOuterDelayLine" << "\n"
+                   << outerDelayLineLength << "\n";
 #endif
-#ifdef doSignalDelay
+#ifdef doInnerDelay
     params_file    << "didSignalDelay" << "\n"
-                   << signalDelayLineLength << "\n";
+                   << innerDelayLineLength << "\n";
 #endif
 }
 
@@ -150,8 +146,8 @@ void handleFiles(){
     remover_file.close();
     nn_file.close();
 #endif
-    signal_file.close();
-    noise_file.close();
+    inner_file.close();
+    outer_file.close();
     lms_file.close();
     laplace_file.close();
     lms_remover_file.close();
@@ -159,15 +155,13 @@ void handleFiles(){
 
 int main(int argc, const char *argv[]) {
     //std::srand(1);
-for (int k = 0; k < num_recordings; k++) {
-    int RECORDING = k+1;
-    cout << "recording: " << RECORDING << endl;
+for (int k = 0; k < num_subjects; k++) {
+    int SUBJECT = k+1;
+    cout << "subject: " << SUBJECT << endl;
     //int count = 0;
-    signal_counter = 0;
-    noise_counter = 0;
 
     //create files for saving the data and parameters
-    string rcrdng = std::to_string(RECORDING);
+    string sbjct = std::to_string(SUBJECT);
 #ifdef DoDeepLearning
     fstream nn_file;
     fstream remover_file;
@@ -175,16 +169,17 @@ for (int k = 0; k < num_recordings; k++) {
 #endif
 
 #ifdef DoDeepLearning
-    nn_file.open("./cppData/recording" + rcrdng + "/fnn_recording" + rcrdng + ".tsv", fstream::out);
-    remover_file.open("./cppData/recording" + rcrdng + "/remover_recording" + rcrdng + ".tsv", fstream::out);
-    weight_file.open("./cppData/recording" + rcrdng + "/lWeights_recording" + rcrdng + ".tsv", fstream::out);
+    nn_file.open("./cppData/subject" + sbjct + "/fnn_subject" + sbjct + ".tsv", fstream::out);
+    remover_file.open("./cppData/subject" + sbjct + "/remover_subject" + sbjct + ".tsv", fstream::out);
+    weight_file.open("./cppData/subject" + sbjct + "/lWeights_subject" + sbjct + ".tsv", fstream::out);
 #endif
-    signal_file.open("./cppData/recording" + rcrdng + "/signal_recording" + rcrdng + ".tsv", fstream::out);
-    noise_file.open("./cppData/recording" + rcrdng + "/noise_recording" + rcrdng + ".tsv", fstream::out);
-    params_file.open("./cppData/recording" + rcrdng + "/cppParams_recording" + rcrdng + ".tsv", fstream::out);
-    lms_file.open("./cppData/recording" + rcrdng + "/lmsOutput_recording" + rcrdng + ".tsv", fstream::out);
-    lms_remover_file.open("./cppData/recording" + rcrdng + "/lmsCorrelation_recording" + rcrdng + ".tsv", fstream::out);
-    laplace_file.open("./cppData/recording" + rcrdng + "/laplace_recording" + rcrdng + ".tsv", fstream::out);
+    inner_file.open("./cppData/subject" + sbjct + "/inner_subject" + sbjct + ".tsv", fstream::out);
+    outer_file.open("./cppData/subject" + sbjct + "/outer_subject" + sbjct + ".tsv", fstream::out);
+    params_file.open("./cppData/subject" + sbjct + "/cppParams_subject" + sbjct + ".tsv", fstream::out);
+    lms_file.open("./cppData/subject" + sbjct + "/lmsOutput_subject" + sbjct + ".tsv", fstream::out);
+    lms_remover_file.open("./cppData/subject" + sbjct + "/lmsCorrelation_subject" + sbjct + ".tsv", fstream::out);
+    laplace_file.open("./cppData/subject" + sbjct + "/laplace_subject" + sbjct + ".tsv", fstream::out);
+
 
     if (!params_file) {
         cout << "Unable to create files";
@@ -195,20 +190,20 @@ for (int k = 0; k < num_recordings; k++) {
         exit(1); // terminate with error
     }
 
-    raw_infile.open("./RecordingData/Recording" + rcrdng + ".tsv");
+    raw_infile.open("./SubjectData/Subject" + sbjct + ".tsv");
     
     if (!raw_infile) {
         cout << "Unable to open file";
         exit(1); // terminate with error
     }
 
-#ifdef doNoisePreFilter
-    noise_filter = new Fir1("./pyFiles/forOuter.dat");
-    noise_filter->reset();
+#ifdef doOuterPreFilter
+    outer_filter = new Fir1("./pyFiles/forOuter.dat");
+    outer_filter->reset();
 #endif
-#ifdef doSignalPreFilter
-    signal_filter = new Fir1("./pyFiles/forInner.dat");
-    signal_filter->reset();
+#ifdef doInnerPreFilter
+    inner_filter = new Fir1("./pyFiles/forInner.dat");
+    inner_filter->reset();
 #endif
 //#ifdef doOuterPreFilter
 //    int waitOutFilterDelay = maxFilterLength;
@@ -234,68 +229,58 @@ for (int k = 0; k < num_recordings; k++) {
 while (!raw_infile.eof()) {
         //count += 1;
         //get the data from .tsv files:
-        raw_infile >> sample_num >> signal_raw_data >> noise_raw_data >> check_digit;
+        raw_infile >> sample_num >> inner_raw_data >> outer_raw_data >> check_digit;
 
         // GET ALL GAINS:
 #ifdef DoDeepLearning
-        signal_gain = 1;
-        noise_gain = 1;
-        remover_gain = 1;
-        feedback_gain = 1;
+        inner_gain = 1;
+        outer_gain = 1;
+        remover_gain = 0.5;
+        feedback_gain = 10;
 #endif
 
-        //A) SIGNAL ELECTRODE:
+        //A) INNER ELECTRODE:
         //1) AMPLIFY
-        double signal_raw = signal_gain * signal_raw_data;
+        double inner_raw = inner_gain * inner_raw_data;
         //2) FILTERED
-#ifdef doSignalPreFilter
-        double signal_filtered = signal_filter->filter(signal_raw);
-	signal_counter+=1;
-	if(signal_counter<fs){
-		signal_filtered = 0;
-		}
+#ifdef doInnerPreFilter
+        double inner_filtered = inner_filter->filter(inner_raw);
 #else
-        double signal_filtered = signal_raw;
+        double inner_filtered = inner_raw;
 #endif
         //3) DELAY
-#ifdef doSignalDelay
-        signal_delayLine.push_back(signal_filtered);
-        double signal = signal_delayLine[0];
+#ifdef doInnerDelay
+        inner_delayLine.push_back(inner_filtered);
+        double inner = inner_delayLine[0];
 #else
-        double signal = signal_filtered;
+        double inner = inner_filtered;
 #endif
 
-        //B) NOISE ELECTRODE:
+        //B) OUTER ELECTRODE:
         //1) AMPLIFY
-        double noise_raw = noise_gain * noise_raw_data;
-
+        double outer_raw = outer_gain * outer_raw_data;
         //2) FILTERED
-#ifdef doNoisePreFilter
-        double noise_filtered = noise_filter->filter(noise_raw);
-	noise_counter+=1;
-	if(noise_counter<fs){
-		noise_filtered = 0;
-		}
+#ifdef doOuterPreFilter
+        double outer_filtered = outer_filter->filter(outer_raw);
 #else
-        double noise_filtered = noise_raw;
-
+        double outer_filtered = outer_raw;
 #endif
         //3) DELAY LINE
-        for (int i = noiseDelayLineLength-1 ; i > 0; i--){
-            noise_delayLine[i] = noise_delayLine[i-1];
+        for (int i = outerDelayLineLength-1 ; i > 0; i--){
+            outer_delayLine[i] = outer_delayLine[i-1];
 
         }
-        noise_delayLine[0] = noise_filtered;
-        double* noise_delayed = &noise_delayLine[0];
+        outer_delayLine[0] = outer_filtered;
+        double* outer_delayed = &outer_delayLine[0];
 
-        // NOISE INPUT TO NETWORK
+        // OUTER INPUT TO NETWORK
 #ifdef DoDeepLearning
-        NN->setInputs(noise_delayed);
+        NN->setInputs(outer_delayed);
         NN->propInputs();
 
         // REMOVER OUTPUT FROM NETWORK
         double remover = NN->getOutput(0) * remover_gain;
-        double f_nn = (signal - remover) * feedback_gain;
+        double f_nn = (inner - remover) * feedback_gain;
 
         // FEEDBACK TO THE NETWORK 
         NN->setErrorCoeff(0, 1, 0, 0, 0, 0); //global, back, mid, forward, local, echo error
@@ -306,7 +291,7 @@ while (!raw_infile.eof()) {
         // LEARN
 #ifdef DoDeepLearning
         w_eta = 1;
-        b_eta = 1;
+        b_eta = 2;
 #endif
 
 #ifdef DoDeepLearning
@@ -318,24 +303,24 @@ while (!raw_infile.eof()) {
             weight_file << NN->getLayerWeightDistance(i) << " ";
         }
         weight_file << NN->getWeightDistance() << "\n";
-        NN->snapWeights("cppData", "", RECORDING);
+        NN->snapWeights("cppData", "", SUBJECT);
         double l1 = NN->getLayerWeightDistance(0);
         double l2 = NN->getLayerWeightDistance(1);
         double l3 = NN->getLayerWeightDistance(2);
 #endif
 
         // Do Laplace filter
-        double laplace = signal - noise_filtered;
+        double laplace = inner - outer_filtered;
 
         // Do LMS filter
-        corrLMS += lms_filter->filter(noise_filtered);
-        lms_output = signal - corrLMS;
+        corrLMS += lms_filter->filter(outer_filtered);
+        lms_output = inner - corrLMS;
         lms_filter->lms_update(lms_output);
 
         // SAVE SIGNALS INTO FILES
         laplace_file << laplace << endl;
-        signal_file << signal << endl;
-        noise_file << noise_filtered << endl;
+        inner_file << inner << endl;
+        outer_file << outer_filtered << endl;
 #ifdef DoDeepLearning
         remover_file << remover << endl;
         nn_file << f_nn << endl;
@@ -351,7 +336,7 @@ while (!raw_infile.eof()) {
         if (cv::waitKey(20) == ESC_key) {
             saveParam();
 #ifdef DoDeepLearning
-            NN->snapWeights("cppData", "", RECORDING);
+            NN->snapWeights("cppData", "", SUBJECT);
 #endif
             handleFiles();
             freeMemory();

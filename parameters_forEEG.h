@@ -1,9 +1,8 @@
 //
 // Created by sama on 25/06/19.
-// Edited by lily on 9/08/21.
 //
-#ifndef ECGFILTER_PARAMETERS_H
-#define ECGFILTER_PARAMETERS_H
+#ifndef EEGFILTER_PARAMETERS_H
+#define EEGFILTER_PARAMETERS_H
 
 #define LMS_COEFF (int)(250)
 #define LMS_LEARNING_RATE 0.00001
@@ -13,14 +12,14 @@
 #define maxFilterLength 250
 
 // NOISE:
-#define doNoisePreFilter
-#define doNoiseDelayLine
-#define noiseDelayLineLength 59
+#define doOuterPreFilter
+#define doOuterDelayLine
+#define outerDelayLineLength 59
 
 // SIGNAL:
-#define doSignalPreFilter
-#define doSignalDelay
-#define signalDelayLineLength 59
+#define doInnerPreFilter
+#define doInnerDelay
+#define innerDelayLineLength 59
 
 //NN specifications
 #define DoDeepLearning
@@ -37,4 +36,4 @@
 #define N1 2 //1
 #define N0 1 //this has to always be 1
 
-#endif //ECGFILTER_PARAMETERS_H
+#endif //EEGFILTER_PARAMETERS_H
