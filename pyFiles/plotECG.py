@@ -66,7 +66,7 @@ def findRMS(data):
 pyplot.close("all")
     
 # select recording number
-recording=11
+recording=9
 
 # directory of script file
 print(os.path.abspath(os.path.dirname(sys.argv[0])))
@@ -82,17 +82,24 @@ DNS_data = np.loadtxt('../cppData/recording{}/fnn_recording{}.tsv'.format(record
 LMS_data = np.loadtxt('../cppData/recording{}/lmsOutput_recording{}.tsv'.format(recording,recording))
 LPLC_data = np.loadtxt('../cppData/recording{}/laplace_recording{}.tsv'.format(recording,recording))
 
+# remove buffer from DNS
+SIGNAL_data = SIGNAL_data[60:len(SIGNAL_data)]
+NOISE_data = NOISE_data[60:len(NOISE_data)]
+DNS_data = DNS_data[60:len(DNS_data)]
+LMS_data = LMS_data[60:len(LMS_data)]
+LPLC_data = LPLC_data[60:len(LPLC_data)]
+
 SIGNAL_amp, SIGNAL_dbs, SIGNAL_freq = doFourierTransform(SIGNAL_data)
-# plotTimeDomainNumber("Filtered Signal Time Domain",SIGNAL_data)
-# plotFourier("Filtered Signal",SIGNAL_amp, SIGNAL_freq)
+plotTimeDomainNumber("Filtered Signal Time Domain",SIGNAL_data)
+plotFourier("Filtered Signal",SIGNAL_amp, SIGNAL_freq)
 
 NOISE_amp, NOISE_dbs, NOISE_freq = doFourierTransform(NOISE_data)
-# plotTimeDomainNumber("Filtered Noise Time Domain",NOISE_data)
-# plotFourier("Filtered Noise",NOISE_amp, NOISE_freq)
+plotTimeDomainNumber("Filtered Noise Time Domain",NOISE_data)
+plotFourier("Filtered Noise",NOISE_amp, NOISE_freq)
     
 DNS_amp, DNS_dbs, DNS_freq = doFourierTransform(DNS_data)
-# plotTimeDomainNumber("Network Output Time Domain",DNS_data)
-# plotFourier("Network Output",DNS_amp, DNS_freq)
+plotTimeDomainNumber("Network Output Time Domain",DNS_data)
+plotFourier("Network Output",DNS_amp, DNS_freq)
 
 LMS_amp, LMS_dbs, LMS_freq = doFourierTransform(LMS_data)
 # plotTimeDomain("LMS from fir1 Output Time Domain",LMS_data)
@@ -123,12 +130,12 @@ print(SNRAfter)
 # # SNR (RMS method from time domain data)
 # # recording 1 clean sample no. is 1500 - 2050, noiser sample no. is 1240 - 1320, 2850 - 2910
 # # recording 11 clean sample no. is 2300 - 2900, noise sample no. is 5180 - 5240, 4815 - 4880
-# SIGNAL_rms_clean = findRMS(SIGNAL_data[2300:2900])
-# DNS_rms_clean = findRMS(DNS_data[2300:2900])
-# LPLC_rms_clean = findRMS(LPLC_data[2300:2900])
-# SIGNAL_rms_noise = findRMS(SIGNAL_data[5180:5240])
-# DNS_rms_noise = findRMS(DNS_data[5180:5240])
-# LPLC_rms_noise = findRMS(LPLC_data[5180:5240])
+# SIGNAL_rms_clean = findRMS(SIGNAL_data[2300-60:2900-60])
+# DNS_rms_clean = findRMS(DNS_data[2300-60:2900-60])
+# LPLC_rms_clean = findRMS(LPLC_data[2300-60:2900-60])
+# SIGNAL_rms_noise = findRMS(SIGNAL_data[5180-60:5240-60])
+# DNS_rms_noise = findRMS(DNS_data[5180-60:5240-60])
+# LPLC_rms_noise = findRMS(LPLC_data[5180-60:5240-60])
 # SIGNAL_snr = 20*np.log10(SIGNAL_rms_clean/SIGNAL_rms_noise)
 # DNS_snr = 20*np.log10(DNS_rms_clean/DNS_rms_noise)
 # LPLC_snr = 20*np.log10(LPLC_rms_clean/LPLC_rms_noise)
