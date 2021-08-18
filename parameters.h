@@ -13,12 +13,12 @@
 #define maxFilterLength 250
 
 // NOISE:
-#define doNoisePreFilter
+//#define doNoisePreFilter
 #define doNoiseDelayLine
 #define noiseDelayLineLength 59
 
 // SIGNAL:
-#define doSignalPreFilter
+//#define doSignalPreFilter
 #define doSignalDelay
 #define signalDelayLineLength 59
 

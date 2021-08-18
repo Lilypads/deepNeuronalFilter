@@ -162,7 +162,7 @@ int main(int argc, const char *argv[]) {
 for (int k = 0; k < num_recordings; k++) {
     int RECORDING = k+1;
     cout << "recording: " << RECORDING << endl;
-    //int count = 0;
+    int count = 0;
     signal_counter = 0;
     noise_counter = 0;
 
@@ -210,15 +210,15 @@ for (int k = 0; k < num_recordings; k++) {
     signal_filter = new Fir1("./pyFiles/forInner.dat");
     signal_filter->reset();
 #endif
-//#ifdef doOuterPreFilter
-//    int waitOutFilterDelay = maxFilterLength;
-//#else
-//#ifdef doInnerPreFilter
-//    int waitOutFilterDelay = maxFilterLength;
-//#else
-//    int waitOutFilterDelay = 1;
-//#endif
-//#endif
+#ifdef doNoisePreFilter
+    int waitOutFilterDelay = maxFilterLength;
+#else
+#ifdef doSignalPreFilter
+    int waitOutFilterDelay = maxFilterLength;
+#else
+    int waitOutFilterDelay = 1;
+#endif
+#endif
 
     lms_filter = new Fir1(LMS_COEFF);
     lms_filter->setLearningRate(LMS_LEARNING_RATE);
@@ -232,7 +232,7 @@ for (int k = 0; k < num_recordings; k++) {
 #endif
 
 while (!raw_infile.eof()) {
-        //count += 1;
+        count += 1;
         //get the data from .tsv files:
         raw_infile >> sample_num >> signal_raw_data >> noise_raw_data >> check_digit;
 
@@ -251,7 +251,7 @@ while (!raw_infile.eof()) {
 #ifdef doSignalPreFilter
         double signal_filtered = signal_filter->filter(signal_raw);
 	signal_counter+=1;
-	if(signal_counter<fs){
+	if(signal_counter<maxFilterLength){
 		signal_filtered = 0;
 		}
 #else
@@ -273,7 +273,7 @@ while (!raw_infile.eof()) {
 #ifdef doNoisePreFilter
         double noise_filtered = noise_filter->filter(noise_raw);
 	noise_counter+=1;
-	if(noise_counter<fs){
+	if(noise_counter<maxFilterLength){
 		noise_filtered = 0;
 		}
 #else
@@ -311,7 +311,10 @@ while (!raw_infile.eof()) {
 
 #ifdef DoDeepLearning
         NN->setLearningRate(w_eta, b_eta);
-        NN->updateWeights();
+	if(count > waitOutFilterDelay + noiseDelayLineLength){
+		NN->updateWeights(); //puts in neuron 
+	}
+        
 
         // SAVE WEIGHTS
         for (int i = 0; i < NLAYERS; i++) {
