@@ -74,11 +74,11 @@ def doAllStuff(recording_num):
     recording=recording_num
     
     # directory of script file
-    print(os.path.abspath(os.path.dirname(sys.argv[0])))
+    # print(os.path.abspath(os.path.dirname(sys.argv[0])))
     # change current working directory
     os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
     # check current working directory
-    print(os.getcwd())
+    # print(os.getcwd())
     
     #RAW_data = np.loadtxt('../Recording_Data/Recording{}.tsv'.format(recording))
     SIGNAL_data = np.loadtxt('../cppData/recording{}/signal_recording{}.tsv'.format(recording,recording))
@@ -95,7 +95,7 @@ def doAllStuff(recording_num):
     LPLC_data = LPLC_data[delayLineLength:len(LPLC_data)]
     
     SIGNAL_amp, SIGNAL_dbs, SIGNAL_freq = doFourierTransform(SIGNAL_data)
-    plotTimeDomainNumber("Filtered Signal Time Domain",SIGNAL_data)
+    # plotTimeDomainNumber("Filtered Signal Time Domain",SIGNAL_data)
     # plotFourier("Filtered Signal",SIGNAL_amp, SIGNAL_freq)
     
     NOISE_amp, NOISE_dbs, NOISE_freq = doFourierTransform(NOISE_data)
@@ -103,7 +103,7 @@ def doAllStuff(recording_num):
     # plotFourier("Filtered Noise",NOISE_amp, NOISE_freq)
         
     DNS_amp, DNS_dbs, DNS_freq = doFourierTransform(DNS_data)
-    plotTimeDomainNumber("Network Output Time Domain",DNS_data)
+    # plotTimeDomainNumber("Network Output Time Domain",DNS_data)
     # plotFourier("Network Output",DNS_amp, DNS_freq)
     
     LMS_amp, LMS_dbs, LMS_freq = doFourierTransform(LMS_data)
@@ -138,15 +138,31 @@ def doAllStuff(recording_num):
         # sumNOISE_noisy = np.sum(NOISE_amp[sStart:sEnd])
         sumDNS_noisy = np.sum(DNS_amp[sStart:sEnd])
         return sumSIGNAL_noisy,sumDNS_noisy
-    
+
+#run individually
 # pick 2 recordings, one from clean one from noisy recordings
-sumSIGNAL_clean,sumDNS_clean = doAllStuff(3)
-sumSIGNAL_noisy,sumDNS_noisy = doAllStuff(7)
+sumSIGNAL_clean,sumDNS_clean = doAllStuff(9)
+sumSIGNAL_noisy,sumDNS_noisy = doAllStuff(10)
 
 SNRBefore = sumSIGNAL_clean/ (sumSIGNAL_noisy-sumSIGNAL_clean)
 SNRAfter = sumDNS_clean / (sumDNS_noisy-sumDNS_clean)
 print(SNRBefore)
 print(SNRAfter)
+
+# #run in pairs
+# i=1
+# while(i<=total_recording):    
+#     # pick 2 recordings, one from clean one from noisy recordings
+#     sumSIGNAL_clean,sumDNS_clean = doAllStuff(i)
+#     i+=1
+#     sumSIGNAL_noisy,sumDNS_noisy = doAllStuff(i)
+    
+#     SNRBefore = sumSIGNAL_clean/ (sumSIGNAL_noisy-sumSIGNAL_clean)
+#     SNRAfter = sumDNS_clean / (sumDNS_noisy-sumDNS_clean)
+#     print("recording set:",i/2)
+#     print(SNRBefore)
+#     print(SNRAfter)
+#     i+=1
 
 # # SNR (RMS method from time domain data)
 # # recording 1 clean sample no. is 1500 - 2050, noiser sample no. is 1240 - 1320, 2850 - 2910
