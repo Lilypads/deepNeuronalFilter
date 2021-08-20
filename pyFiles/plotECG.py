@@ -14,6 +14,9 @@ import sys
 total_recording = 12
 fs = 250
 
+delayLineLength = 60
+preFilterBuffer = 250
+
 def doFourierTransform(data):
     # Plot Frequency Domain
     data_fft = np.fft.fft(data) 
@@ -66,7 +69,7 @@ def findRMS(data):
 pyplot.close("all")
     
 # select recording number
-recording=9
+recording=12
 
 # directory of script file
 print(os.path.abspath(os.path.dirname(sys.argv[0])))
@@ -83,23 +86,23 @@ LMS_data = np.loadtxt('../cppData/recording{}/lmsOutput_recording{}.tsv'.format(
 LPLC_data = np.loadtxt('../cppData/recording{}/laplace_recording{}.tsv'.format(recording,recording))
 
 # remove buffer from DNS
-SIGNAL_data = SIGNAL_data[60:len(SIGNAL_data)]
-NOISE_data = NOISE_data[60:len(NOISE_data)]
-DNS_data = DNS_data[60:len(DNS_data)]
-LMS_data = LMS_data[60:len(LMS_data)]
-LPLC_data = LPLC_data[60:len(LPLC_data)]
+SIGNAL_data = SIGNAL_data[delayLineLength:len(SIGNAL_data)]
+NOISE_data = NOISE_data[delayLineLength:len(NOISE_data)]
+DNS_data = DNS_data[delayLineLength+preFilterBuffer+60:len(DNS_data)]
+LMS_data = LMS_data[delayLineLength:len(LMS_data)]
+LPLC_data = LPLC_data[delayLineLength:len(LPLC_data)]
 
 SIGNAL_amp, SIGNAL_dbs, SIGNAL_freq = doFourierTransform(SIGNAL_data)
-plotTimeDomainNumber("Filtered Signal Time Domain",SIGNAL_data)
-plotFourier("Filtered Signal",SIGNAL_amp, SIGNAL_freq)
+# plotTimeDomainNumber("Filtered Signal Time Domain",SIGNAL_data)
+# plotFourier("Filtered Signal",SIGNAL_amp, SIGNAL_freq)
 
 NOISE_amp, NOISE_dbs, NOISE_freq = doFourierTransform(NOISE_data)
-plotTimeDomainNumber("Filtered Noise Time Domain",NOISE_data)
-plotFourier("Filtered Noise",NOISE_amp, NOISE_freq)
+# plotTimeDomainNumber("Filtered Noise Time Domain",NOISE_data)
+# plotFourier("Filtered Noise",NOISE_amp, NOISE_freq)
     
 DNS_amp, DNS_dbs, DNS_freq = doFourierTransform(DNS_data)
-plotTimeDomainNumber("Network Output Time Domain",DNS_data)
-plotFourier("Network Output",DNS_amp, DNS_freq)
+# plotTimeDomainNumber("Network Output Time Domain",DNS_data)
+# plotFourier("Network Output",DNS_amp, DNS_freq)
 
 LMS_amp, LMS_dbs, LMS_freq = doFourierTransform(LMS_data)
 # plotTimeDomain("LMS from fir1 Output Time Domain",LMS_data)
