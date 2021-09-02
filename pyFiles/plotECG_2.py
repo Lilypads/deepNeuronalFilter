@@ -83,7 +83,7 @@ def doAllStuff(recording_num):
     # remove buffer from DNS
     SIGNAL_data = SIGNAL_data[delayLineLength:len(SIGNAL_data)]
     NOISE_data = NOISE_data[delayLineLength:len(NOISE_data)]
-    DNS_data = DNS_data[delayLineLength+preFilterBuffer+60:len(DNS_data)]
+    DNS_data = DNS_data[delayLineLength+preFilterBuffer+delayLineLength:len(DNS_data)]
     LMS_data = LMS_data[delayLineLength:len(LMS_data)]
     LPLC_data = LPLC_data[delayLineLength:len(LPLC_data)]
     
