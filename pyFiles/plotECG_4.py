@@ -157,6 +157,23 @@ print(SNRAfter)
 #     print(SNRAfter)
 #     i+=1
 
+# #run 1-6 with 7 C, 9 C50
+# total_recording = 6
+# i=1
+# while(i<=total_recording):    
+#    # pick 2 recordings, one from clean one from noisy recordings
+#     if i<=3:
+#         sumSIGNAL_clean,sumDNS_clean = doAllStuff(7)
+#     else:
+#         sumSIGNAL_clean,sumDNS_clean = doAllStuff(9)
+#     sumSIGNAL_noisy,sumDNS_noisy = doAllStuff(i)
+#     SNRBefore = sumSIGNAL_clean/ (sumSIGNAL_noisy-sumSIGNAL_clean)
+#     SNRAfter = sumDNS_clean / (sumDNS_noisy-sumDNS_clean)
+#     print("recording set:",i)
+#     print(SNRBefore)
+#     print(SNRAfter)
+#     i+=1
+
 # # plot greylayers
 # total_layers = 11
 
