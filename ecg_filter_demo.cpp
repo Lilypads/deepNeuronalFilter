@@ -228,7 +228,7 @@ for (int k = 0; k < num_recordings; k++) {
 
         //setting up the neural networks
 #ifdef DoDeepLearning
-    NN->initNetwork(Neuron::W_RANDOM, Neuron::B_RANDOM, Neuron::Act_Sigmoid);
+    NN->initNetwork(Neuron::W_ZEROS, Neuron::B_NONE, Neuron::Act_Sigmoid);
 #endif
 
 while (!raw_infile.eof()) {
