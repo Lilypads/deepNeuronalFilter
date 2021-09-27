@@ -297,6 +297,10 @@ while (!raw_infile.eof()) {
         double remover = NN->getOutput(0) * remover_gain;
         double f_nn = (signal - remover) * feedback_gain;
 
+	/*if(remover != 0){
+        	cout << "Not zero remover here!" << sample_num << ": "<< f_nn;
+	}*/
+
         // FEEDBACK TO THE NETWORK 
         NN->setErrorCoeff(0, 1, 0, 0, 0, 0); //global, back, mid, forward, local, echo error
         NN->setBackwardError(f_nn);
@@ -305,8 +309,10 @@ while (!raw_infile.eof()) {
 
         // LEARN
 #ifdef DoDeepLearning
-        w_eta = 1;
-        b_eta = 1;
+	if(count == waitOutFilterDelay + noiseDelayLineLength + 1){
+		w_eta = 8;
+       		b_eta = 1;
+	}
 #endif
 
 #ifdef DoDeepLearning
@@ -322,9 +328,13 @@ while (!raw_infile.eof()) {
         }
         weight_file << NN->getWeightDistance() << "\n";
         NN->snapWeights("cppData", "", RECORDING);
-        double l1 = NN->getLayerWeightDistance(0);
-        double l2 = NN->getLayerWeightDistance(1);
-        double l3 = NN->getLayerWeightDistance(2);
+        //double l1 = NN->getLayerWeightDistance(0);
+        //double l2 = NN->getLayerWeightDistance(1);
+        //double l3 = NN->getLayerWeightDistance(2);
+
+	 /*if(NN->getWeightDistance() != 0){
+        	cout << "Not zero weight here!" << sample_num << ": "<< NN->getWeightDistance();
+	 	}*/
 #endif
 
         // Do Laplace filter
