@@ -81,8 +81,8 @@ def doAllStuff(recording_num):
     LPLC_data = np.loadtxt('../cppData/recording{}/laplace_recording{}.tsv'.format(recording,recording))
     
     # remove buffer from DNS
-    SIGNAL_data = SIGNAL_data[delayLineLength:len(SIGNAL_data)]
-    NOISE_data = NOISE_data[delayLineLength:len(NOISE_data)]
+    SIGNAL_data = SIGNAL_data[delayLineLength+preFilterBuffer:len(SIGNAL_data)]
+    NOISE_data = NOISE_data[delayLineLength+preFilterBuffer:len(NOISE_data)]
     DNS_data = DNS_data[delayLineLength+preFilterBuffer:len(DNS_data)]
     LMS_data = LMS_data[delayLineLength:len(LMS_data)]
     LPLC_data = LPLC_data[delayLineLength:len(LPLC_data)]
