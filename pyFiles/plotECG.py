@@ -174,6 +174,21 @@ print(SNRAfter)
 #     print(SNRAfter)
 #     i+=1
 
+#for participants data
+participant = 1
+total_recording = 4
+
+for i in range(len(total_recording)):    
+    # pick 2 recordings, one from clean one from noisy recordings
+    sumSIGNAL_clean,sumDNS_clean = doAllStuff(1)
+
+    sumSIGNAL_noisy,sumDNS_noisy = doAllStuff(participant*4-3+i)
+    SNRBefore = sumSIGNAL_clean/ (sumSIGNAL_noisy-sumSIGNAL_clean)
+    SNRAfter = sumDNS_clean / (sumDNS_noisy-sumDNS_clean)
+    print("recording set:",i+1)
+    print(SNRBefore)
+    print(SNRAfter)
+
 # # plot greylayers
 # total_layers = 11
 
