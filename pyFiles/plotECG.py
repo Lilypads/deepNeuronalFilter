@@ -178,7 +178,7 @@ print(SNRAfter)
 participant = 1
 total_recording = 4
 
-for i in range(len(total_recording)):    
+for i in range(total_recording):    
     # pick 2 recordings, one from clean one from noisy recordings
     sumSIGNAL_clean,sumDNS_clean = doAllStuff(1)
 
