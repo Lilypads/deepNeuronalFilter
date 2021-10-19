@@ -2,7 +2,7 @@
 
 mkdir -p cppData
 n=1;
-max=4*15;//12;
+max=60;//12;
 while [ "$n" -le "$max" ]; do
   mkdir -p "cppData/recording$n"
   n=`expr "$n" + 1`;
