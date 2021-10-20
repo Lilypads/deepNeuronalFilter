@@ -30,8 +30,8 @@ def plotTimeDomainNumber(name,amplitude):
     pyplot.ylabel('Amplitude') 
 
 total_recording = 9
-participant = 8
-date=["24Sep2021","30Sep2021","12Oct2021" ,"12Oct2021" ,"12Oct2021" ,"12Oct2021" ,"14Oct2021" ,"14Oct2021" ]
+participant = 1
+date=["24Sep2021","30Sep2021","12Oct2021" ,"12Oct2021" ,"12Oct2021" ,"12Oct2021" ,"14Oct2021" ,"14Oct2021","19Oct2021" ]
 
 # directory of script file
 print(os.path.abspath(os.path.dirname(sys.argv[0])))
@@ -51,8 +51,8 @@ for i in range(total_recording):
     print(dataARRAY[0,0])
     # plotTimeDomainNumber("Raw data",dataARRAY[:,1])
 
-    save = [1,4,5,6] #1,2,4,8
-    # save = [2,4,5,6] #3,5,6
+    save = [1,4,5,6] #2,4,8
+    save = [2,4,5,6] #1,3,5,6
     # save = [1,7,8,9] #7
     if i+1 in save:
         np.savetxt('../pRecordingData/Recording{}.tsv'.format(counter), dataARRAY , delimiter ='\t', fmt=['%d','%f','%f','%d'])

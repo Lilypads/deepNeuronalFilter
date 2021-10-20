@@ -231,6 +231,12 @@ for (int k = 0; k < num_recordings; k++) {
     NN->initNetwork(Neuron::W_ZEROS, Neuron::B_NONE, Neuron::Act_Sigmoid);
 #endif
 
+double removerBuffer[noiseDelayLineLength] ={0.0};
+int removerBufferIndex = 0;
+double sumRemover = 0;
+double sumNoise = 0;
+float ratioRN = 0;
+
 while (!raw_infile.eof()) {
         count += 1;
         //get the data from .tsv files:
@@ -296,6 +302,29 @@ while (!raw_infile.eof()) {
         // REMOVER OUTPUT FROM NETWORK
         double remover = NN->getOutput(0) * remover_gain;
         double f_nn = (signal - remover) * feedback_gain;
+
+	  if(waitOutFilterDelay + noiseDelayLineLength + 1 < count && count <= waitOutFilterDelay + noiseDelayLineLength + 1 + noiseDelayLineLength){
+		removerBuffer[removerBufferIndex] = remover;
+		removerBufferIndex += 1;
+		}
+
+	  if(count == waitOutFilterDelay + noiseDelayLineLength + 1){
+		for(int n = 0; n<noiseDelayLineLength; n++){
+			sumNoise = sumNoise + abs(noise_delayLine[n]);
+  			}
+		}
+
+	  if(count == waitOutFilterDelay + noiseDelayLineLength + 1 + noiseDelayLineLength + 1){
+		for(int n = 0; n<noiseDelayLineLength; n++){
+			sumRemover = sumRemover + abs(removerBuffer[n]);
+			//sumNoise = sumNoise + abs(noise_delayLine[n]);
+  			}
+		ratioRN = sumNoise/noise_gain/sumRemover;
+		remover_gain *=ratioRN;
+
+    		params_file    << "Remover/Noise ratio" << "\n"
+                   << ratioRN << "\n";
+		}
 
 	/*if(remover != 0){
         	cout << "Not zero remover here!" << sample_num << ": "<< f_nn;
