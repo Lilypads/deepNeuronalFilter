@@ -236,6 +236,7 @@ int removerBufferIndex = 0;
 double sumRemover = 0;
 double sumNoise = 0;
 float ratioRN = 0;
+int loopIndex =1;
 
 while (!raw_infile.eof()) {
         count += 1;
@@ -303,27 +304,39 @@ while (!raw_infile.eof()) {
         double remover = NN->getOutput(0) * remover_gain;
         double f_nn = (signal - remover) * feedback_gain;
 
-	  if(waitOutFilterDelay + noiseDelayLineLength + 1 < count && count <= waitOutFilterDelay + noiseDelayLineLength + 1 + noiseDelayLineLength){
+//needs to be declared outside
+//double removerBuffer[noiseDelayLineLength] ={0.0};
+//int removerBufferIndex = 0;
+//double sumRemover = 0;
+//double sumNoise = 0;
+//float ratioRN = 0;
+//int loopIndex =1;
+
+	  if((waitOutFilterDelay + noiseDelayLineLength + 1)*loopIndex < count && count <= (waitOutFilterDelay + noiseDelayLineLength + 1 + noiseDelayLineLength)*loopIndex){
 		removerBuffer[removerBufferIndex] = remover;
 		removerBufferIndex += 1;
+		if(removerBufferIndex > noiseDelayLineLength){
+			removerBufferIndex = 0;
+			loopIndex += 1;
+			}
 		}
 
-	  if(count == waitOutFilterDelay + noiseDelayLineLength + 1){
+	  if(count == (waitOutFilterDelay + noiseDelayLineLength + 1)*loopIndex){
 		for(int n = 0; n<noiseDelayLineLength; n++){
 			sumNoise = sumNoise + abs(noise_delayLine[n]);
   			}
 		}
 
-	  if(count == waitOutFilterDelay + noiseDelayLineLength + 1 + noiseDelayLineLength + 1){
+	  if(count == (waitOutFilterDelay + noiseDelayLineLength + 1 + noiseDelayLineLength + 1)*loopIndex){
 		for(int n = 0; n<noiseDelayLineLength; n++){
 			sumRemover = sumRemover + abs(removerBuffer[n]);
 			//sumNoise = sumNoise + abs(noise_delayLine[n]);
   			}
-		ratioRN = sumNoise/noise_gain/sumRemover;
+		ratioRN = 1.2*sumNoise/noise_gain/sumRemover;
 		remover_gain *=ratioRN;
 
     		params_file    << "Remover/Noise ratio" << "\n"
-                   << ratioRN << "\n";
+                   << ratioRN << loopIndex << "\n";
 		}
 
 	/*if(remover != 0){
