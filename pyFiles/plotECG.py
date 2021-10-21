@@ -180,7 +180,7 @@ total_recording = 4
 
 for i in range(total_recording):    
     # pick 2 recordings, one from clean one from noisy recordings
-    sumSIGNAL_clean,sumDNS_clean = doAllStuff(1)
+    sumSIGNAL_clean,sumDNS_clean = doAllStuff(participant*4-3)
 
     sumSIGNAL_noisy,sumDNS_noisy = doAllStuff(participant*4-3+i)
     SNRBefore = sumSIGNAL_clean/ (sumSIGNAL_noisy-sumSIGNAL_clean)
