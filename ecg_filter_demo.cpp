@@ -315,19 +315,20 @@ while (!raw_infile.eof()) {
 //int saveCount = -1; //outside normal operation range
 //int saveRemoverBufferIndex = 100; //outside normal operation range
 
-	  if(waitOutFilterDelay + (noiseDelayLineLength + 1)*loopIndex < count && count <= waitOutFilterDelay + noiseDelayLineLength + (1 + noiseDelayLineLength)*loopIndex){
-		removerBuffer[removerBufferIndex] = remover;
-		removerBufferIndex += 1;
-		}
-
 	  if(removerBufferIndex == saveRemoverBufferIndex){
 			saveCount = count+5;
 			}
-	  saveRemoverBufferIndex = removerBufferIndex;
+	  if(waitOutFilterDelay + (noiseDelayLineLength + 1)*loopIndex < count && count <= waitOutFilterDelay + noiseDelayLineLength + (1 + noiseDelayLineLength)*loopIndex){
+		removerBuffer[removerBufferIndex] = remover;
+		removerBufferIndex += 1;
+	 	saveRemoverBufferIndex = removerBufferIndex;
+		}
+
 	  if(count == saveCount){
 			removerBufferIndex = 0;
 			loopIndex += 1;
 			}
+
 
 
 	  if(count == waitOutFilterDelay + (noiseDelayLineLength + 1)*loopIndex){
