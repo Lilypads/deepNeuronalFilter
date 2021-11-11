@@ -54,11 +54,13 @@ for i in range(total_recording):
     print(dataARRAY[0,0])
     plotTimeDomainNumber("Raw data",dataARRAY[:,2])
 
-    save = [1,4,5,6] #2,4,10,11
+    save = [1,4,5,6] #2,4,11
     # save = [2,4,5,6] #1,3,5,6
-    save = [1,7,8,9] #7,12,13
+    save = [1,7,8,9] #7,12
     # save = [2,7,5,6] #8
-    # save = [1,7,5,6] #9
+    save = [1,7,5,9] #9
+    save = [1,4,8,6] #10
+    save = [2,4,8,9] #13
     
     if i+1 in save:
         np.savetxt('../pRecordingData/Recording{}.tsv'.format(counter), dataARRAY , delimiter ='\t', fmt=['%d','%f','%f','%d'])
