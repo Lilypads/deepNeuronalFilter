@@ -51,7 +51,7 @@ Process might differ depend on your operating system.
 
 `cd deepNeuronalFilter` 
 
-3) execute the shell file:
+3) Execute the shell file:
 
 `./run_all_stat.sh`
 
