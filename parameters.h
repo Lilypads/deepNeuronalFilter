@@ -13,28 +13,33 @@
 #define maxFilterLength 250
 
 // NOISE:
-//#define doNoisePreFilter
+#define doNoisePreFilter
 #define doNoiseDelayLine
-#define noiseDelayLineLength 59
+#define noiseDelayLineLength 45 //59
 
 // SIGNAL:
-//#define doSignalPreFilter
+#define doSignalPreFilter
 #define doSignalDelay
-#define signalDelayLineLength 59
+#define signalDelayLineLength 45 //59
 
 //NN specifications
 #define DoDeepLearning
-#define NLAYERS 11
-#define N10 29 //10
-#define N9 23 //9
-#define N8 19 //8
-#define N7 17 //7
-#define N6 13 //6
-#define N5 11 //5
-#define N4 7 //4
-#define N3 5 //3
-#define N2 3 //2
-#define N1 2 //1
+#define NLAYERS 7 //original 11
+//#define N14 20 //14
+//#define N13 20 //13
+//#define N12 20 //12
+//#define N11 20 //11
+/*#define N10 20//29 //10
+#define N9 20//23 //9
+#define N8 20//19 //8
+#define N7 20//17 //7*/
+#define N6 39//13 //6
+#define N5 27//11 //5
+#define N4 13//7 //4
+#define N3 7//5 //3
+#define N2 5//3 //2
+#define N1 3//2 //1
 #define N0 1 //this has to always be 1
+
 
 #endif //ECGFILTER_PARAMETERS_H

@@ -5,7 +5,6 @@
 #include <boost/circular_buffer.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <Iir.h>
 #include <Fir1.h>
 #include <chrono>
 #include <string>
@@ -16,14 +15,9 @@
 #include "cldl/Layer.h"
 #include "cldl/Net.h"
 #include "parameters.h"
-#include "dynamicPlots.h"
-
-//#define CVUI_IMPLEMENTATION
-//#include "cvui.h"
+//#include "dynamicPlots.h"
 
 using namespace std;
-constexpr int ESC_key = 27;
-//int startTime = time(NULL);
 
 //adding delay line for the noise
 double noise_delayLine[noiseDelayLineLength] ={0.0};
@@ -31,12 +25,7 @@ boost::circular_buffer<double> signal_delayLine(signalDelayLineLength);
 
 // CONSTANTS
 const float fs = 250;
-//const int numTrials = 2; //as in open and closed
-const int num_recordings = 12;
-
-//COUNTERS
-int signal_counter;
-int noise_counter;
+const int num_recordings = 8;//60;//32;//4;//12;  //how many recording to run
 
 #ifdef doNoiseDelayLine
 int num_inputs = noiseDelayLineLength;
@@ -46,7 +35,10 @@ int num_inputs = 1;
 
 //NEURAL NETWORK
 #ifdef DoDeepLearning
-int nNeurons[NLAYERS]={N10, N9, N8, N7, N6, N5, N4, N3, N2, N1, N0};
+//int nNeurons[NLAYERS]={N0}; //for 1 layer
+int nNeurons[NLAYERS]={N6, N5, N4, N3, N2, N1, N0};
+//int nNeurons[NLAYERS]={N10, N9, N8, N7, N6, N5, N4, N3, N2, N1, N0}; //for 11 layers
+//int nNeurons[NLAYERS]={N14, N13, N12, N11, N10, N9, N8, N7, N6, N5, N4, N3, N2, N1, N0};// for 15 layers
 int* numNeuronsP = nNeurons;
 Net* NN = new Net(NLAYERS, numNeuronsP, num_inputs, 0, "");
 double w_eta = 0;
@@ -89,10 +81,10 @@ void saveParam(){
                 << b_eta << "\n"
                 << "Network: " << "\n"
                 << NLAYERS << "\n"
-                << N10 << "\n"
+                /*<< N10 << "\n"
                 << N9 << "\n"
-                << N8 << "\n"
-                << N7 << "\n"
+                << N8 << "\n"		//for more layers parameter save
+                << N7 << "\n"*/
                 << N6 << "\n"
                 << N5 << "\n"
                 << N4 << "\n"
@@ -124,22 +116,9 @@ void saveParam(){
 }
 
 void freeMemory(){
-//#ifdef DoShowPlots
-//    delete plots;
-//#endif
 #ifdef DoDeepLearning
     delete NN;
 #endif
-//#ifdef doOuterPreFilter
-//    for (auto & i : outer_filter){
-//        delete i;
-//    }
-//#endif
-//#ifdef doInnerPreFilter
-//    for (auto & i : inner_filter){
-//        delete i;
-//    }
-//#endif
     delete lms_filter;
 }
 
@@ -163,8 +142,6 @@ for (int k = 0; k < num_recordings; k++) {
     int RECORDING = k+1;
     cout << "recording: " << RECORDING << endl;
     int count = 0;
-    signal_counter = 0;
-    noise_counter = 0;
 
     //create files for saving the data and parameters
     string rcrdng = std::to_string(RECORDING);
@@ -195,7 +172,7 @@ for (int k = 0; k < num_recordings; k++) {
         exit(1); // terminate with error
     }
 
-    raw_infile.open("./RecordingData/Recording" + rcrdng + ".tsv");
+    raw_infile.open("./RecordingData/Recording" + rcrdng + ".tsv"); //load data
     
     if (!raw_infile) {
         cout << "Unable to open file";
@@ -203,11 +180,11 @@ for (int k = 0; k < num_recordings; k++) {
     }
 
 #ifdef doNoisePreFilter
-    noise_filter = new Fir1("./pyFiles/forOuter.dat");
+    noise_filter = new Fir1("./pyFiles/forNoise.dat");
     noise_filter->reset();
 #endif
 #ifdef doSignalPreFilter
-    signal_filter = new Fir1("./pyFiles/forInner.dat");
+    signal_filter = new Fir1("./pyFiles/forSignal.dat");
     signal_filter->reset();
 #endif
 #ifdef doNoisePreFilter
@@ -228,16 +205,8 @@ for (int k = 0; k < num_recordings; k++) {
 
         //setting up the neural networks
 #ifdef DoDeepLearning
-    NN->initNetwork(Neuron::W_ZEROS, Neuron::B_NONE, Neuron::Act_Sigmoid);
+    NN->initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_Sigmoid);
 #endif
-
-double removerBuffer[noiseDelayLineLength] ={0.0};
-int removerBufferIndex = 0;
-double sumRemover = 0;
-double sumNoise = 0;
-float ratioRN = 0;
-int loopIndex = 1;
-
 
 while (!raw_infile.eof()) {
         count += 1;
@@ -246,10 +215,10 @@ while (!raw_infile.eof()) {
 
         // GET ALL GAINS:
 #ifdef DoDeepLearning
-        signal_gain = 1;
-        noise_gain = 1;
-        remover_gain = 1;
-        feedback_gain = 1;
+        signal_gain = 10000;
+        noise_gain = 100;
+        remover_gain = 100;
+        feedback_gain = 100;
 #endif
 
         //A) SIGNAL ELECTRODE:
@@ -258,10 +227,6 @@ while (!raw_infile.eof()) {
         //2) FILTERED
 #ifdef doSignalPreFilter
         double signal_filtered = signal_filter->filter(signal_raw);
-	signal_counter+=1;
-	if(signal_counter<maxFilterLength){
-		signal_filtered = 0;
-		}
 #else
         double signal_filtered = signal_raw;
 #endif
@@ -280,10 +245,6 @@ while (!raw_infile.eof()) {
         //2) FILTERED
 #ifdef doNoisePreFilter
         double noise_filtered = noise_filter->filter(noise_raw);
-	noise_counter+=1;
-	if(noise_counter<maxFilterLength){
-		noise_filtered = 0;
-		}
 #else
         double noise_filtered = noise_raw;
 
@@ -293,6 +254,7 @@ while (!raw_infile.eof()) {
             noise_delayLine[i] = noise_delayLine[i-1];
 
         }
+
         noise_delayLine[0] = noise_filtered;
         double* noise_delayed = &noise_delayLine[0];
 
@@ -304,46 +266,6 @@ while (!raw_infile.eof()) {
         // REMOVER OUTPUT FROM NETWORK
         double remover = NN->getOutput(0) * remover_gain;
         double f_nn = (signal - remover) * feedback_gain;
-
-//needs to be declared outside
-//double removerBuffer[noiseDelayLineLength] ={0.0};
-//int removerBufferIndex = 0;
-//double sumRemover = 0;
-//double sumNoise = 0;
-//float ratioRN = 0;
-//int loopIndex = 1;
-
-
-	  if(waitOutFilterDelay + (noiseDelayLineLength + 1)*loopIndex < count && count <= waitOutFilterDelay + noiseDelayLineLength + (1 + noiseDelayLineLength)*loopIndex){
-		removerBuffer[removerBufferIndex] = remover;
-		removerBufferIndex += 1;
-		}
-
-	  if(count == waitOutFilterDelay + (noiseDelayLineLength + 1)*loopIndex){
-		for(int n = 0; n<noiseDelayLineLength; n++){
-			sumNoise = sumNoise + abs(noise_delayLine[n]);
-  			}
-		}
-
-	  if(count == waitOutFilterDelay + noiseDelayLineLength + 1 + (noiseDelayLineLength + 1)*loopIndex){
-		for(int n = 0; n<noiseDelayLineLength; n++){
-			sumRemover = sumRemover + abs(removerBuffer[n]);
-			//sumNoise = sumNoise + abs(noise_delayLine[n]);
-  			}
-		ratioRN = 1.2*sumNoise/noise_gain/sumRemover;
-		remover_gain *=ratioRN;
- 
-    		params_file    << "Remover/Noise ratio" << "\n"
-                   << ratioRN << loopIndex << ":" << count << "\n";
-
-		removerBufferIndex = 0;
-		loopIndex += 1;
-		}ratioRN = 1.2*sumNoise/noise_gain/sumRemover;
-		remover_gain *=ratioRN;
-
-    		params_file    << "Remover/Noise ratio" << "\n"
-                   << ratioRN << loopIndex << ":" << count << "\n";
-		}
 
 	/*if(remover != 0){
         	cout << "Not zero remover here!" << sample_num << ": "<< f_nn;
@@ -358,10 +280,11 @@ while (!raw_infile.eof()) {
         // LEARN
 #ifdef DoDeepLearning
 	if(count == waitOutFilterDelay + noiseDelayLineLength + 1){
-		w_eta = 8;
-       		b_eta = 1;
+		w_eta = 0.01;
+       	b_eta = 0;
 	}
 #endif
+
 
 #ifdef DoDeepLearning
         NN->setLearningRate(w_eta, b_eta);
@@ -373,6 +296,7 @@ while (!raw_infile.eof()) {
         // SAVE WEIGHTS
         for (int i = 0; i < NLAYERS; i++) {
             weight_file << NN->getLayerWeightDistance(i) << " ";
+
         }
         weight_file << NN->getWeightDistance() << "\n";
         NN->snapWeights("cppData", "", RECORDING);
@@ -380,9 +304,10 @@ while (!raw_infile.eof()) {
         //double l2 = NN->getLayerWeightDistance(1);
         //double l3 = NN->getLayerWeightDistance(2);
 
-	 /*if(NN->getWeightDistance() != 0){
+	/*if(NN->getWeightDistance() != 0){
         	cout << "Not zero weight here!" << sample_num << ": "<< NN->getWeightDistance();
 	 	}*/
+
 #endif
 
         // Do Laplace filter
@@ -403,21 +328,6 @@ while (!raw_infile.eof()) {
 #endif
         lms_file << lms_output << endl;
         lms_remover_file << corrLMS << endl;
-
-/**
- * If the Esc button is pressed on the interactive window the final SNRs are printed on the console and
- * all SNRs and parameters are saved to a file. Also all pointers are deleted to free dynamically allocated memory.
- * Then the files are closed and program returns with 0.
- */
-        if (cv::waitKey(20) == ESC_key) {
-            saveParam();
-#ifdef DoDeepLearning
-            NN->snapWeights("cppData", "", RECORDING);
-#endif
-            handleFiles();
-            freeMemory();
-            return 0;
-	}
 
 }
 saveParam();

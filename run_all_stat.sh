@@ -2,7 +2,7 @@
 
 mkdir -p cppData
 n=1;
-max=60;//12;
+max=8; //how many recording to run
 while [ "$n" -le "$max" ]; do
   mkdir -p "cppData/recording$n"
   n=`expr "$n" + 1`;
@@ -12,5 +12,5 @@ echo "Successfully created the cpp folders"
 
 cmake .
 make
-./run_eeg_filter
+./run_ecg_filter
 

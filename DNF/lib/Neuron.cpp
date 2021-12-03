@@ -60,7 +60,7 @@ void Neuron::initNeuron(int _neuronIndex, int _layerIndex, weightInitMethod _wim
                 weights[i] = 1;
                 break;
             case W_RANDOM:
-                weights[i] = ((( (double)rand() / (RAND_MAX)) * 2) - 1)/100;
+                weights[i] = ((( (double)rand() / (RAND_MAX)) * 2) - 1);
                 break;
                 //cout << " Neuron: weight is: " << weights[i] << endl;
                 /* rand function generates a random function between
@@ -140,10 +140,16 @@ int Neuron::calcOutput(int _layerHasReported){
     assert(std::isfinite(sum));
     output = doActivation(sum);
     iHaveReported = _layerHasReported;
-    if (output > 0.49 && iHaveReported == 0){
+    if (output > 0.049 && iHaveReported == 0){
         cout << "I'm saturating, " << output << " layer: " << myLayerIndex << " neuron: " << myNeuronIndex << endl;
         iHaveReported = 1;
     }
+
+    if (output > 0.49 && iHaveReported == 1){
+        cout << "I'm saturating!!!, " << output << " layer: " << myLayerIndex << " neuron: " << myNeuronIndex << endl;
+        iHaveReported = 2;
+    }
+
     assert(std::isfinite(output));
     return iHaveReported;
 }
@@ -457,7 +463,7 @@ double Neuron::getInitWeights(int _inputIndex){
 
 void Neuron::saveWeights(){
   char l = '0';
-  char n = '0';
+  char n = '0'; 
   l += myLayerIndex + 1;
   n += myNeuronIndex + 1;
   string name = "w";

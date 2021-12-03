@@ -347,8 +347,8 @@ public:
 
 private:
 
-    double forGrayScale_zero = pow(10,6);
-    double forGrayScale = pow(10,9);
+    double forGrayScale_zero = pow(10,0); //(10,6) EEG
+    double forGrayScale = pow(10,0); //(10,9)
 
     // initialisation:
     int nInputs = 0;

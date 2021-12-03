@@ -14,14 +14,14 @@ fs = 250
 cf = np.arange(0, 126, 1) / fs * 2
 
 outer = sig.firwin(249, [cf[2], cf[45], cf[55]], window='hamming', pass_zero=False)
-np.savetxt('../forOuter.dat', outer)
+np.savetxt('./forNoise.dat', outer)
 fig1 = plt.figure(1)
 ax1 = fig1.add_subplot(111)
 plot1 = ax1.plot(outer)
 plt.show()
 
 inner = sig.firwin(249, [cf[2], cf[45], cf[55]], window='hamming', pass_zero=False)
-np.savetxt('../forInner.dat', inner)
+np.savetxt('./forSignal.dat', inner)
 fig2 = plt.figure(2)
 ax2 = fig2.add_subplot(111)
 plot2 = ax2.plot(inner[20:30])

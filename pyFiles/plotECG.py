@@ -11,10 +11,9 @@ import numpy as np
 import os
 import sys
 
-total_recording = 12
 fs = 250
 
-delayLineLength = 60
+delayLineLength = 45 #45
 preFilterBuffer = 250
     
 # close all plot windows    
@@ -107,72 +106,35 @@ def doAllStuff(recording_num):
     # plotTimeDomain("Laplace Output Time Domain",LPLC_data)
     # plotFourier("Laplace Output",LPLC_amp, LPLC_freq)
     
-    # plotTimeDomain("difference of SIGNAL and NOISE",SIGNAL_data-NOISE_data)
-    # plotFourier("difference of SIGNAL and NOISE",SIGNAL_amp-NOISE_amp,SIGNAL_freq)
-    # plotFourier("difference of Network Output and NOISE",DNS_amp-NOISE_amp,DNS_freq)
-    
     # #try other methods
     # DNS_amp=LMS_amp
     # DNS_amp=LPLC_amp
     
     # find array index number during 0.5-100Hz
     fLEN = len(SIGNAL_amp)
-    fStart =0.5
+    fStart = 0.5 #0.5
     fEnd = 100
     sStart = int(fStart/fs*fLEN)
     sEnd = int(fEnd/fs*fLEN)
-    if recording%2 == 1:   #clean recordings are odd numbers
-        sumSIGNAL_clean = np.sum(SIGNAL_amp[sStart:sEnd])
-        #sumNOISE_clean = np.sum(NOISE_amp[sStart:sEnd])
-        sumDNS_clean = np.sum(DNS_amp[sStart:sEnd])
-        return sumSIGNAL_clean,sumDNS_clean
-    else:               #noisy recordings are even numbers
-        sumSIGNAL_noisy = np.sum(SIGNAL_amp[sStart:sEnd])
-        # sumNOISE_noisy = np.sum(NOISE_amp[sStart:sEnd])
-        sumDNS_noisy = np.sum(DNS_amp[sStart:sEnd])
-        return sumSIGNAL_noisy,sumDNS_noisy
+ 
+    sumSIGNAL = np.sum(SIGNAL_amp[sStart:sEnd])
+    sumDNS = np.sum(DNS_amp[sStart:sEnd])
+    return sumSIGNAL,sumDNS
 
-#run individually
-# pick 2 recordings, one from clean one from noisy recordings
-sumSIGNAL_clean,sumDNS_clean = doAllStuff(7)
-sumSIGNAL_noisy,sumDNS_noisy = doAllStuff(8)
+# #run individually
+# # pick 2 recordings, one from clean one from noisy recordings
+# sumSIGNAL_clean,sumDNS_clean = doAllStuff(1)
+# sumSIGNAL_noisy,sumDNS_noisy = doAllStuff(2)
+# # print(sumSIGNAL_clean)
+# # print(sumDNS_clean)
+# # print(sumSIGNAL_noisy)
+# # print(sumDNS_noisy)
 
-SNRBefore = sumSIGNAL_clean/ (sumSIGNAL_noisy-sumSIGNAL_clean)
-SNRAfter = sumDNS_clean / (sumDNS_noisy-sumDNS_clean)
-print(SNRBefore)
-print(SNRAfter)
+# SNRBefore = sumSIGNAL_clean/ (sumSIGNAL_noisy-sumSIGNAL_clean)
+# SNRAfter = sumDNS_clean / (sumDNS_noisy-sumDNS_clean)
+# print(SNRBefore)
+# print(SNRAfter)
 
-# #run in pairs
-# i=1
-# while(i<=total_recording):    
-#     # pick 2 recordings, one from clean one from noisy recordings
-#     sumSIGNAL_clean,sumDNS_clean = doAllStuff(i)
-#     i+=1
-#     sumSIGNAL_noisy,sumDNS_noisy = doAllStuff(i)
-    
-#     SNRBefore = sumSIGNAL_clean/ (sumSIGNAL_noisy-sumSIGNAL_clean)
-#     SNRAfter = sumDNS_clean / (sumDNS_noisy-sumDNS_clean)
-#     print("recording set:",i/2)
-#     print(SNRBefore)
-#     print(SNRAfter)
-#     i+=1
-
-# #run 1-6 with 7 C, 9 C50
-# total_recording = 6
-# i=1
-# while(i<=total_recording):    
-#    # pick 2 recordings, one from clean one from noisy recordings
-#     if i<=3:
-#         sumSIGNAL_clean,sumDNS_clean = doAllStuff(7)
-#     else:
-#         sumSIGNAL_clean,sumDNS_clean = doAllStuff(9)
-#     sumSIGNAL_noisy,sumDNS_noisy = doAllStuff(i)
-#     SNRBefore = sumSIGNAL_clean/ (sumSIGNAL_noisy-sumSIGNAL_clean)
-#     SNRAfter = sumDNS_clean / (sumDNS_noisy-sumDNS_clean)
-#     print("recording set:",i)
-#     print(SNRBefore)
-#     print(SNRAfter)
-#     i+=1
 
 #for participants data
 participant = 1
@@ -189,35 +151,10 @@ for i in range(total_recording):
     print(SNRBefore)
     print(SNRAfter)
 
-# # plot greylayers
-# total_layers = 11
+# #for just plots >> also uncomment plot lines above
+# total_recording=1
+# i=1
+# while(i<=total_recording):  
+#     doAllStuff(i)
+#     i+=1
 
-# for layerIndex in range(1, total_layers+1, 1):
-#     data = np.loadtxt('../cppData/recording{}/grayLayer{}__subject{}.csv'
-#                       .format(recording, layerIndex, recording), dtype=float)
-#     numNeurons = data.shape[0]
-#     numInputs = data.shape[1]
-#     # dataNormTemp = data - data.min()
-#     dataNorm = data / abs(data).max()
-#     fig1 = pyplot.figure('x recording{}, layer {}'.format(recording, layerIndex))
-#     ax1 = fig1.add_subplot(111)
-#     for i in range(dataNorm.shape[0]):
-#         ax1.plot(dataNorm[i, :])
-#         pyplot.title('recording{}'.format(recording))
-#     pyplot.show()
-#     fig = pyplot.figure('recording{}, layer {}'.format(recording, layerIndex))
-#     ax = fig.add_subplot(111)
-#     myImage = ax.imshow(dataNorm, cmap='bone', interpolation='none')
-#     fig.colorbar(myImage, ax=ax)
-#     pyplot.gca().set_yticks(np.arange(0, numNeurons, 2))
-#     pyplot.gca().set_xticks(np.arange(0, numInputs, 5))
-#     ax.set_aspect(aspect=2)
-#     pyplot.title('recording{}'.format(recording))
-#     pyplot.show()
-#     # fig.savefig('../cppData' + fileName[myData] + '/recording' + str(recording)
-#     #             + '/py_layer' + str(layerIndex) + '_gray_' + str(tri) + 'recording' + str(recording),
-#     #             quality=10, format='eps', bbox_inches='tight')
-#     # fig1.savefig('../cppData' + fileName[myData] + '/recording' + str(recording)
-#     #              + '/py_layer' + str(layerIndex) + '_x_' + str(tri) + 'recording' + str(recording),
-#     #              quality=10, format='eps', bbox_inches='tight')
-    

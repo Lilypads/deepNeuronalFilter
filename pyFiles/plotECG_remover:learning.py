@@ -20,21 +20,21 @@ print(os.getcwd())
 # close all plot windows    
 # pyplot.close("all")
 
-delayLineLength = 45
+delayLineLength = 45 #45
 preFilterBuffer = 250
 
-recording=4
-data = np.loadtxt('../cppData/recording{}/lWeights_recording{}.tsv'.format(recording,recording))
-data2 = np.loadtxt('../cppData/recording{}/remover_recording{}.tsv'.format(recording,recording))
+recording=1
+weightChange = np.loadtxt('../cppData/recording{}/lWeights_recording{}.tsv'.format(recording,recording))
+remover = np.loadtxt('../cppData/recording{}/remover_recording{}.tsv'.format(recording,recording))
 
 pyplot.figure()
-pyplot.plot(data[:,-1])
+pyplot.plot(weightChange[:,-1])
 pyplot.title('Weight Change (learning)')
 pyplot.xlabel('Sample Number')
 pyplot.ylabel('Amplitude') 
 
 pyplot.figure()
-pyplot.plot(data2[2*delayLineLength+preFilterBuffer:len(data2)])
+pyplot.plot(remover[delayLineLength+preFilterBuffer:len(data2)])
 pyplot.title('Remover')
 pyplot.xlabel('Sample Number')
 pyplot.ylabel('Amplitude') 
