@@ -34,7 +34,7 @@ pyplot.xlabel('Sample Number')
 pyplot.ylabel('Amplitude') 
 
 pyplot.figure()
-pyplot.plot(remover[delayLineLength+preFilterBuffer:len(data2)])
+pyplot.plot(remover[delayLineLength+preFilterBuffer:len(remover)])
 pyplot.title('Remover')
 pyplot.xlabel('Sample Number')
 pyplot.ylabel('Amplitude') 
