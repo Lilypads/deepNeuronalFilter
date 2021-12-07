@@ -15,7 +15,6 @@
 #include "cldl/Layer.h"
 #include "cldl/Net.h"
 #include "parameters.h"
-//#include "dynamicPlots.h"
 
 using namespace std;
 
