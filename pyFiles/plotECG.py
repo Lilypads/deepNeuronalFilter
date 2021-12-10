@@ -87,15 +87,15 @@ def doAllStuff(recording_num):
     LPLC_data = LPLC_data[delayLineLength:len(LPLC_data)]
     
     SIGNAL_amp, SIGNAL_dbs, SIGNAL_freq = doFourierTransform(SIGNAL_data)
-    # plotTimeDomainNumber("Filtered Signal Time Domain",SIGNAL_data)
+    plotTimeDomainNumber("Pre-Filtered Signal Time Domain",SIGNAL_data)
     # plotFourier("Filtered Signal",SIGNAL_amp, SIGNAL_freq)
     
     NOISE_amp, NOISE_dbs, NOISE_freq = doFourierTransform(NOISE_data)
-    # plotTimeDomainNumber("Filtered Noise Time Domain",NOISE_data)
+    # plotTimeDomainNumber("Pre-Filtered Noise Time Domain",NOISE_data)
     # plotFourier("Filtered Noise",NOISE_amp, NOISE_freq)
         
     DNS_amp, DNS_dbs, DNS_freq = doFourierTransform(DNS_data)
-    # plotTimeDomainNumber("Network Output Time Domain",DNS_data)
+    plotTimeDomainNumber("Network Output Time Domain",DNS_data)
     # plotFourier("Network Output",DNS_amp, DNS_freq)
     
     LMS_amp, LMS_dbs, LMS_freq = doFourierTransform(LMS_data)
@@ -137,7 +137,7 @@ def doAllStuff(recording_num):
 
 
 #for participants data
-participant = 1
+participant = 3
 total_recording = 4
 
 for i in range(total_recording):    
@@ -152,7 +152,7 @@ for i in range(total_recording):
     print(SNRAfter)
 
 # #for just plots >> also uncomment plot lines above
-# total_recording=1
+# total_recording=4
 # i=1
 # while(i<=total_recording):  
 #     doAllStuff(i)
